@@ -3,10 +3,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ContentPlan, ContentItem } from '../types';
 import { generateMarketingImage, fileToBase64 } from '../services/geminiService';
 import { Spinner } from './Spinner';
+import { ImageModal } from './ImageModal';
 
 interface ContentSuiteProps {
   plan: ContentPlan;
   onPlanUpdate: (updatedItems: ContentItem[]) => void; // Callback to update parent with edited text
+  onDownloadReport?: () => void; // Callback for download report button
 }
 
 // --- SUB-COMPONENT: Script Editor Row ---
@@ -67,6 +69,7 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
   const [error, setError] = useState<string | null>(null);
   const [refImage, setRefImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -105,7 +108,14 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
                 <div className="relative w-full h-full">
                     <img src={image} alt={item.title_zh} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                         <a href={image} download={`${item.id}.png`} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white backdrop-blur-sm" title="下載">
+                         <button
+                             onClick={() => setIsModalOpen(true)}
+                             className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white backdrop-blur-sm"
+                             title="放大檢視"
+                         >
+                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
+                         </button>
+                         <a href={image} download={`${item.id}.png`} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white backdrop-blur-sm" title="下載" onClick={(e) => e.stopPropagation()}>
                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                          </a>
                          <button onClick={handleGenerate} className="p-2 bg-white/20 hover:bg-white/40 rounded-full text-white backdrop-blur-sm" title="重繪">
@@ -159,12 +169,20 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
             <p className="text-xs text-gray-400 line-clamp-2" title={item.copy_zh}>{item.copy_zh}</p>
             {error && <p className="text-[10px] text-red-400">{error}</p>}
         </div>
+
+        {/* Image Modal */}
+        <ImageModal
+            isOpen={isModalOpen}
+            imageUrl={image}
+            onClose={() => setIsModalOpen(false)}
+            title={item.title_zh}
+        />
     </div>
   );
 };
 
 // --- MAIN COMPONENT ---
-export const ContentSuite: React.FC<ContentSuiteProps> = ({ plan, onPlanUpdate }) => {
+export const ContentSuite: React.FC<ContentSuiteProps> = ({ plan, onPlanUpdate, onDownloadReport }) => {
   const [mode, setMode] = useState<'review' | 'production'>('review');
   const [items, setItems] = useState<ContentItem[]>(plan.items);
 
@@ -188,7 +206,7 @@ export const ContentSuite: React.FC<ContentSuiteProps> = ({ plan, onPlanUpdate }
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
         {/* Header & Mode Switch */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 border-b border-white/10 pb-6">
+        <div className="flex flex-col mb-8 gap-4 border-b border-white/10 pb-6">
             <div>
                 <h2 className="text-2xl font-bold text-white serif mb-1">
                     {plan.plan_name}
@@ -196,19 +214,32 @@ export const ContentSuite: React.FC<ContentSuiteProps> = ({ plan, onPlanUpdate }
                 <p className="text-gray-400 text-sm">Content Suite Plan ({items.length} Assets)</p>
             </div>
             
-            <div className="bg-[#1a1a1f] p-1 rounded-lg flex items-center border border-white/10">
-                <button 
-                    onClick={() => setMode('review')}
-                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'review' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-white'}`}
-                >
-                    1. 腳本審閱 (Script)
-                </button>
-                <button 
-                    onClick={() => setMode('production')}
-                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'production' ? 'bg-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}
-                >
-                    2. 圖片製作 (Production)
-                </button>
+            {/* 三個按鈕水平對齊排列 */}
+            <div className="flex flex-wrap items-center gap-3">
+                <div className="bg-[#1a1a1f] p-1 rounded-lg flex items-center border border-white/10">
+                    <button 
+                        onClick={() => setMode('review')}
+                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'review' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        1. 腳本審閱 (Script)
+                    </button>
+                    <button 
+                        onClick={() => setMode('production')}
+                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'production' ? 'bg-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        2. 圖片製作 (Production)
+                    </button>
+                </div>
+                
+                {onDownloadReport && (
+                    <button 
+                        onClick={onDownloadReport}
+                        className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-gray-300 hover:text-white transition-all"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        下載全案策略報告 (.txt)
+                    </button>
+                )}
             </div>
         </div>
 
