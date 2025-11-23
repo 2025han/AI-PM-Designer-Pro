@@ -36,12 +36,19 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, imageUrl, onClos
           </div>
         )}
 
-        {/* Image */}
-        <div className="relative bg-black rounded-lg overflow-hidden border border-white/20 shadow-2xl">
+        {/* Image Container - 修正 16:9 圖片顯示問題 */}
+        <div className="relative bg-black rounded-lg overflow-hidden border border-white/20 shadow-2xl flex items-center justify-center" style={{ maxHeight: '85vh', maxWidth: '95vw', minHeight: '200px' }}>
           <img 
             src={imageUrl} 
             alt={title || "放大檢視"} 
-            className="max-w-full max-h-[85vh] object-contain"
+            className="w-auto h-auto"
+            style={{ 
+              maxWidth: '95vw', 
+              maxHeight: '85vh',
+              width: 'auto',
+              height: 'auto',
+              objectFit: 'contain'
+            }}
           />
         </div>
 
@@ -63,4 +70,3 @@ export const ImageModal: React.FC<ImageModalProps> = ({ isOpen, imageUrl, onClos
     </div>
   );
 };
-

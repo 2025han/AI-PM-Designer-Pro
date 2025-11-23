@@ -8,6 +8,7 @@ import { ImageModal } from './ImageModal';
 interface ContentSuiteProps {
   plan: ContentPlan;
   onPlanUpdate: (updatedItems: ContentItem[]) => void; // Callback to update parent with edited text
+  onDownloadReport?: () => void; // Callback for download report button
 }
 
 // --- SUB-COMPONENT: Script Editor Row ---
@@ -68,20 +69,14 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
   const [error, setError] = useState<string | null>(null);
   const [refImage, setRefImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // Aspect Ratio State for Story Slides (only for story_slide type)
-  const [storyAspectRatio, setStoryAspectRatio] = useState<'9:16' | '16:9'>('9:16');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Determine the actual ratio to use
-  const actualRatio = item.type === 'story_slide' ? storyAspectRatio : item.ratio;
 
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Use the item's edited prompt, specific reference image, and selected aspect ratio
-      const result = await generateMarketingImage(item.visual_prompt_en, refImage || undefined, actualRatio);
+      // Use the item's edited prompt and specific reference image
+      const result = await generateMarketingImage(item.visual_prompt_en, refImage || undefined, item.ratio);
       setImage(result);
     } catch (e: any) {
       setError(e.message || "Failed");
@@ -102,15 +97,8 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
   };
 
   // Styling based on ratio
-  const getContainerClass = () => {
-    if (actualRatio === '1:1') return "aspect-square w-full";
-    if (actualRatio === '9:16') return "aspect-[9/16] w-full";
-    if (actualRatio === '16:9') return "aspect-[16/9] w-full";
-    return "aspect-[9/16] w-full";
-  };
-  
-  const containerClass = getContainerClass();
-  const labelClass = actualRatio === '1:1' ? "bg-blue-500/20 text-blue-300 border-blue-500/30" : "bg-pink-500/20 text-pink-300 border-pink-500/30";
+  const containerClass = item.ratio === '1:1' ? "aspect-square w-full" : "aspect-[9/16] w-full";
+  const labelClass = item.ratio === '1:1' ? "bg-blue-500/20 text-blue-300 border-blue-500/30" : "bg-pink-500/20 text-pink-300 border-pink-500/30";
 
   return (
     <div className="flex flex-col gap-3 group relative">
@@ -157,7 +145,7 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
                 </div>
             )}
             <div className={`absolute top-2 left-2 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border backdrop-blur-sm z-20 ${labelClass}`}>
-                {actualRatio}
+                {item.ratio}
             </div>
         </div>
 
@@ -178,36 +166,6 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
                     </button>
                 </div>
             </div>
-            
-            {/* Aspect Ratio Selection for Story Slides */}
-            {item.type === 'story_slide' && (
-                <div className="bg-[#1e1e24] rounded p-2 border border-white/5">
-                    <label className="block text-[10px] text-gray-400 mb-1">圖片比例</label>
-                    <div className="flex gap-1">
-                        <button
-                            onClick={() => setStoryAspectRatio('9:16')}
-                            className={`flex-1 py-1 px-2 rounded text-[10px] font-bold transition-colors ${
-                                storyAspectRatio === '9:16' 
-                                    ? 'bg-pink-600 text-white' 
-                                    : 'bg-black/30 text-gray-400 hover:bg-black/50'
-                            }`}
-                        >
-                            9:16
-                        </button>
-                        <button
-                            onClick={() => setStoryAspectRatio('16:9')}
-                            className={`flex-1 py-1 px-2 rounded text-[10px] font-bold transition-colors ${
-                                storyAspectRatio === '16:9' 
-                                    ? 'bg-pink-600 text-white' 
-                                    : 'bg-black/30 text-gray-400 hover:bg-black/50'
-                            }`}
-                        >
-                            16:9
-                        </button>
-                    </div>
-                </div>
-            )}
-            
             <p className="text-xs text-gray-400 line-clamp-2" title={item.copy_zh}>{item.copy_zh}</p>
             {error && <p className="text-[10px] text-red-400">{error}</p>}
         </div>
@@ -248,39 +206,40 @@ export const ContentSuite: React.FC<ContentSuiteProps> = ({ plan, onPlanUpdate, 
   return (
     <div className="w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
         {/* Header & Mode Switch */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4 border-b border-white/10 pb-6">
-            <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-2xl font-bold text-white serif">
-                        {plan.plan_name}
-                    </h2>
-                    {onDownloadReport && (
-                        <button 
-                            onClick={onDownloadReport}
-                            className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-gray-300 hover:text-white transition-all shrink-0"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            <span className="hidden sm:inline">下載全案策略報告</span>
-                            <span className="sm:hidden">下載報告</span>
-                        </button>
-                    )}
-                </div>
+        <div className="flex flex-col mb-8 gap-4 border-b border-white/10 pb-6">
+            <div>
+                <h2 className="text-2xl font-bold text-white serif mb-1">
+                    {plan.plan_name}
+                </h2>
                 <p className="text-gray-400 text-sm">Content Suite Plan ({items.length} Assets)</p>
             </div>
             
-            <div className="bg-[#1a1a1f] p-1 rounded-lg flex items-center border border-white/10 shrink-0">
-                <button 
-                    onClick={() => setMode('review')}
-                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'review' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-white'}`}
-                >
-                    1. 腳本審閱 (Script)
-                </button>
-                <button 
-                    onClick={() => setMode('production')}
-                    className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'production' ? 'bg-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}
-                >
-                    2. 圖片製作 (Production)
-                </button>
+            {/* 三個按鈕水平對齊排列 */}
+            <div className="flex flex-wrap items-center gap-3">
+                <div className="bg-[#1a1a1f] p-1 rounded-lg flex items-center border border-white/10">
+                    <button 
+                        onClick={() => setMode('review')}
+                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'review' ? 'bg-gray-700 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        1. 腳本審閱 (Script)
+                    </button>
+                    <button 
+                        onClick={() => setMode('production')}
+                        className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${mode === 'production' ? 'bg-purple-600 text-white shadow' : 'text-gray-400 hover:text-white'}`}
+                    >
+                        2. 圖片製作 (Production)
+                    </button>
+                </div>
+                
+                {onDownloadReport && (
+                    <button 
+                        onClick={onDownloadReport}
+                        className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-gray-300 hover:text-white transition-all"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        下載全案策略報告 (.txt)
+                    </button>
+                )}
             </div>
         </div>
 
