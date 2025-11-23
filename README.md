@@ -1,4 +1,4 @@
-# AI Product Marketing Designer PRO v2.0
+# AI Product Marketing Designer PRO v2.9
 
 **AI Product Marketing Designer PRO** 是一個專為行銷人員與產品經理打造的智慧化視覺生產力工具。
 
@@ -12,7 +12,7 @@
 
 ---
 
-## 🚀 PRO v2.0 核心功能
+## 🚀 PRO v2.9 核心功能
 
 ### 1. 深度感知輸入 (Context-Aware Input)
 *   **產品視覺分析**: 自動識別產品材質、光影與設計語言。
@@ -21,31 +21,92 @@
 
 ### 2. Phase 1: 視覺策略制定 (Strategy Director)
 *   **三路並進**: AI 總監會根據產品屬性，構思三條截然不同的視覺行銷路線 (Routes)。
+    *   **差異化標準**: 確保三條路線在目標客群、訴求方式、視覺風格、情感調性至少三個維度上不同。
+    *   **品質保證**: 遵循專業廣告海報標準（構圖、光影、文字排版、品牌一致性）。
+    *   **目標客群明確**: 每條路線明確指出目標客群（年齡、性別、職業、興趣、使用場景）。
+    *   **視覺元素具體**: 詳細描述色彩方案、字體風格、構圖方式、材質質感、氛圍營造。
 *   **概念預覽**: 為每條路線生成 3 張高質感的廣告海報概念圖，協助您定調視覺風格。
+    *   **比例選擇**: 支援 3:4（直式）或 4:3（橫式）比例選擇。
+    *   **圖片放大檢視**: 生成後可點擊放大檢視，並支援下載。
 *   **中英雙語摘要**: 提供繁體中文的風格解說與畫面構成摘要。
 
 ### 3. Phase 2: 全套內容企劃 (Content Suite Planning)
 一旦選定策略，AI 將自動規劃一套 **8 張圖的完整社群行銷素材包**：
 *   **A. 方形主視覺 (Square 1:1)**:
     *   包含標準電商白底圖 (Main White) 與情境廣告圖 (Main Lifestyle)。
-*   **B. 社群長圖漏斗 (Stories 9:16)**:
+*   **B. 社群長圖漏斗 (Stories 9:16 或 16:9)**:
     *   自動規劃 6 張連貫的銷售故事：**封面 (Hook) → 痛點 (Problem) → 解法 (Solution) → 細節 (Features) → 信任 (Trust) → 行動 (CTA)**。
+    *   **比例選擇**: 支援 9:16（直式）或 16:9（橫式）比例選擇。
+    *   **敘事連貫性**: 確保 6 張圖在視覺元素、文案邏輯、故事節奏上完美銜接。
+    *   **視覺一致性**: 8 張圖統一色彩方案、字體系統、設計元素、品牌識別。
 
 ### 4. 專業工作流：審閱與製作 (Review & Production Workflow)
-v2.0 引入了專業的廣告製作流程：
+v2.9 引入了專業的廣告製作流程：
 *   **腳本審閱模式 (Script Review)**: 在生成圖片前，您可以完全掌控並編輯每一張圖的文案 (Copy) 與 AI 繪圖提示詞 (Prompt)。
 *   **精細化控圖 (Reference Control)**: 支援為企劃中的**每一張圖**單獨上傳參考圖片 (例如：最後一張 CTA 圖需要放上特定的 Logo，或第一張圖需要參考特定配色)。
 *   **一鍵量產**: 確認無誤後，切換至製作模式即可快速生成高品質素材。
+*   **圖片放大檢視**: 所有生成的圖片都支援放大檢視功能，方便檢查細節。
+
+### 5. 系統提示詞優化 (v2.9 新功能)
+*   **階段一優化**:
+    *   差異化標準具體化（四個維度差異要求）
+    *   品質標準定義（構圖、光影、文字排版、品牌一致性）
+    *   目標客群明確化（新增目標客群描述欄位）
+    *   視覺元素具體化（新增視覺元素描述欄位）
+    *   品牌資訊處理深度（提取方法、雜訊過濾）
+    *   競爭差異化分析
+    *   輸出格式驗證
+*   **階段二優化**:
+    *   敘事連貫性要求（轉場邏輯、視覺一致性、文案銜接）
+    *   視覺一致性要求（8 張圖統一風格）
+    *   文案長度規範（明確字數限制）
+    *   CTA 設計具體化（動詞選擇、緊迫感、行動指示）
+    *   參考文案分析深度（結構分析、說服技巧、情感訴求）
+    *   AIDA 模型應用（明確對應關係）
+    *   痛點挖掘深度（功能、情感、社交痛點）
+    *   信任背書多樣性（數據、證言、認證、品牌故事）
+    *   產品特點呈現（優先級、視覺化、術語轉譯）
+    *   階段銜接一致性（延續階段一的視覺風格）
+    *   輸出格式驗證（完整的格式檢查要求）
 
 ---
 
-## ⚠️ GitHub Pages 部署指南 (重要)
+## 🔑 API 調用管理
 
-如果您將程式碼上傳至 GitHub Pages 後發現頁面空白，是因為瀏覽器無法直接執行 `.tsx` 原始碼。您需要透過 GitHub Actions 自動打包應用程式。
+### API Key 設定
+本應用程式使用 **Google Gemini API** 進行 AI 分析與圖像生成。為了確保安全與隱私，所有 API 調用都使用您自己的 API Key。
 
-### 步驟 1: 設定 GitHub Actions
+### 安全機制
+*   **本地儲存**: API Key 僅儲存在瀏覽器的 `localStorage` 中，**不會上傳至任何伺服器**。
+*   **隱私保護**: 所有 API 調用都在您的瀏覽器中直接執行，資料不會經過第三方伺服器。
+*   **隨時更換**: 您可以隨時在應用程式中更換 API Key，無需重新載入頁面。
+
+### 取得 API Key
+1. 前往 [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. 登入您的 Google 帳號
+3. 點擊「Create API Key」建立新的 API Key
+4. 複製 API Key 並貼到應用程式的設定中
+
+### 使用方式
+1. 首次使用時，應用程式會自動彈出 API Key 設定視窗
+2. 輸入您的 Gemini API Key 並點擊「儲存」
+3. 之後即可正常使用所有功能
+4. 如需更換 API Key，點擊右上角的「更換 API Key」按鈕
+
+### 注意事項
+*   API Key 請妥善保管，不要分享給他人
+*   建議定期檢查 API 使用量，避免超出配額
+*   如遇到 API 錯誤，請檢查 API Key 是否正確或是否已啟用相關服務
+
+---
+
+## 🚀 部署指南
+
+### GitHub Pages 部署
+
+#### 步驟 1: 設定 GitHub Actions
 1. 在您的 GitHub 儲存庫中，建立資料夾路徑：`.github/workflows/`
-2. 在該資料夾內建立一個檔案 `deploy.yml`。
+2. 在該資料夾內建立一個檔案 `deploy.yml`
 3. 複製以下內容貼上：
 
 ```yaml
@@ -91,20 +152,94 @@ jobs:
         uses: actions/deploy-pages@v4
 ```
 
-### 步驟 2: 開啟權限
-1. 進入 GitHub 儲存庫的 **Settings** > **Pages**。
-2. 在 **Build and deployment** > **Source** 選項中，選擇 **GitHub Actions** (不要選 Deploy from a branch)。
+#### 步驟 2: 開啟權限
+1. 進入 GitHub 儲存庫的 **Settings** > **Pages**
+2. 在 **Build and deployment** > **Source** 選項中，選擇 **GitHub Actions** (不要選 Deploy from a branch)
 3. 推送程式碼更新，等待 Actions 跑完 (約 1-2 分鐘)，您的網站就會正常顯示了！
+
+#### 步驟 3: 設定 Base Path（可選）
+如果您的網站部署在子路徑下（例如 `https://username.github.io/repo-name/`），需要在 `vite.config.ts` 中設定 `base`：
+
+```typescript
+export default defineConfig({
+  base: '/repo-name/', // 替換為您的儲存庫名稱
+  // ... 其他設定
+})
+```
+
+---
+
+### Cloudflare Pages 部署
+
+#### 步驟 1: 連接 GitHub 儲存庫
+1. 登入 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. 前往 **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**
+3. 選擇您的 GitHub 帳號並授權
+4. 選擇要部署的儲存庫
+
+#### 步驟 2: 設定建置配置
+1. **Project name**: 輸入專案名稱
+2. **Production branch**: 設定為 `main` 或 `master`
+3. **Build command**: `npm run build`
+4. **Build output directory**: `dist`
+5. **Root directory**: `/` (預設)
+
+#### 步驟 3: 環境變數（可選）
+如果需要設定環境變數，可以在 **Settings** > **Environment variables** 中新增：
+- `NODE_VERSION`: `20` (確保使用正確的 Node.js 版本)
+
+#### 步驟 4: 部署
+1. 點擊 **Save and Deploy**
+2. Cloudflare 會自動開始建置和部署
+3. 部署完成後，您會獲得一個 `*.pages.dev` 的網址
+4. 可以設定自訂網域（在 **Custom domains** 中設定）
+
+#### 步驟 5: 自動部署
+之後每次推送到 GitHub 的 `main` 分支，Cloudflare Pages 會自動重新建置和部署。
 
 ---
 
 ## 🛠 技術棧 (Tech Stack)
 
-*   **Frontend**: React 19, TypeScript, Tailwind CSS
+*   **Frontend**: React 18, TypeScript, Tailwind CSS
 *   **AI Models**:
     *   **Gemini 2.5 Flash**: 負責多模態視覺分析、品牌語意理解、行銷策略規劃 (Thinking Budget Enabled)。
-    *   **Gemini 3 Pro Image Preview**: 負責執行高解析度的廣告圖像生成 (支援 1:1 與 9:16 構圖)。
+    *   **Gemini 3 Pro Image Preview**: 負責執行高解析度的廣告圖像生成 (支援 1:1、3:4、4:3、9:16、16:9 構圖)。
 *   **Build Tool**: Vite
+*   **狀態管理**: React Hooks (useState, useEffect)
+*   **儲存**: localStorage (API Key 本地儲存)
+
+---
+
+## 💬 技術支援與討論
+
+如有任何問題、建議或需要技術支援，歡迎加入 **FlyPig 專屬 LINE 群組**：
+
+👉 [**加入 FlyPig LINE 群組**](https://line.me/ti/g2/kKgOBCab1372ZBvqX4V4rabkQaWqRiwZZuwv1g)
+
+我們會在這裡提供：
+*   技術支援與問題解答
+*   功能更新與使用教學
+*   社群討論與經驗分享
+*   最新功能預覽與測試
+
+---
+
+## 📝 更新日誌
+
+### v2.9 (2025)
+*   **系統提示詞全面優化**: 階段一和階段二共 16 項優化，提升輸出品質與一致性
+*   **比例選擇功能**: 階段一支援 3:4/4:3，階段二支援 9:16/16:9
+*   **圖片放大檢視**: 所有生成的圖片都支援放大檢視功能
+*   **UI/UX 優化**: 下載按鈕排版優化，16:9 圖片顯示問題修正
+
+### v2.8 (2025)
+*   UI/UX 優化與修正
+
+### v2.0 (2025)
+*   專業工作流：審閱與製作模式
+*   精細化控圖：單獨上傳參考圖片
+*   一鍵量產功能
 
 ---
 
