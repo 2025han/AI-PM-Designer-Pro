@@ -70,13 +70,19 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
   const [refImage, setRefImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Aspect Ratio State for Story Slides (only for story_slide type)
+  const [storyAspectRatio, setStoryAspectRatio] = useState<'9:16' | '16:9'>('9:16');
+  
+  // Determine the actual ratio to use
+  const actualRatio = item.type === 'story_slide' ? storyAspectRatio : item.ratio;
 
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Use the item's edited prompt and specific reference image
-      const result = await generateMarketingImage(item.visual_prompt_en, refImage || undefined, item.ratio);
+      // Use the item's edited prompt, specific reference image, and selected aspect ratio
+      const result = await generateMarketingImage(item.visual_prompt_en, refImage || undefined, actualRatio);
       setImage(result);
     } catch (e: any) {
       setError(e.message || "Failed");
@@ -97,8 +103,15 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
   };
 
   // Styling based on ratio
-  const containerClass = item.ratio === '1:1' ? "aspect-square w-full" : "aspect-[9/16] w-full";
-  const labelClass = item.ratio === '1:1' ? "bg-blue-500/20 text-blue-300 border-blue-500/30" : "bg-pink-500/20 text-pink-300 border-pink-500/30";
+  const getContainerClass = () => {
+    if (actualRatio === '1:1') return "aspect-square w-full";
+    if (actualRatio === '9:16') return "aspect-[9/16] w-full";
+    if (actualRatio === '16:9') return "aspect-[16/9] w-full";
+    return "aspect-[9/16] w-full";
+  };
+  
+  const containerClass = getContainerClass();
+  const labelClass = actualRatio === '1:1' ? "bg-blue-500/20 text-blue-300 border-blue-500/30" : "bg-pink-500/20 text-pink-300 border-pink-500/30";
 
   return (
     <div className="flex flex-col gap-3 group relative">
@@ -145,7 +158,7 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
                 </div>
             )}
             <div className={`absolute top-2 left-2 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border backdrop-blur-sm z-20 ${labelClass}`}>
-                {item.ratio}
+                {actualRatio}
             </div>
         </div>
 
@@ -166,6 +179,46 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
                     </button>
                 </div>
             </div>
+            
+            {/* Aspect Ratio Selection for Story Slides */}
+            {item.type === 'story_slide' && (
+                <div className="bg-[#1e1e24] rounded p-2 border border-white/5">
+                    <label className="block text-[10px] text-gray-400 mb-1">圖片比例</label>
+                    <div className="flex gap-1">
+                        <button
+                            onClick={() => {
+                                if (storyAspectRatio !== '9:16') {
+                                    setStoryAspectRatio('9:16');
+                                    setImage(null); // 清除已生成的圖片，因為比例改變了
+                                }
+                            }}
+                            className={`flex-1 py-1 px-2 rounded text-[10px] font-bold transition-colors ${
+                                storyAspectRatio === '9:16' 
+                                    ? 'bg-pink-600 text-white' 
+                                    : 'bg-black/30 text-gray-400 hover:bg-black/50'
+                            }`}
+                        >
+                            9:16
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (storyAspectRatio !== '16:9') {
+                                    setStoryAspectRatio('16:9');
+                                    setImage(null); // 清除已生成的圖片，因為比例改變了
+                                }
+                            }}
+                            className={`flex-1 py-1 px-2 rounded text-[10px] font-bold transition-colors ${
+                                storyAspectRatio === '16:9' 
+                                    ? 'bg-pink-600 text-white' 
+                                    : 'bg-black/30 text-gray-400 hover:bg-black/50'
+                            }`}
+                        >
+                            16:9
+                        </button>
+                    </div>
+                </div>
+            )}
+            
             <p className="text-xs text-gray-400 line-clamp-2" title={item.copy_zh}>{item.copy_zh}</p>
             {error && <p className="text-[10px] text-red-400">{error}</p>}
         </div>

@@ -15,6 +15,8 @@ export interface MarketingRoute {
   headline_zh: string;
   subhead_zh: string;
   style_brief_zh: string;
+  target_audience_zh?: string; // 目標客群描述（新增，可選以保持向後相容）
+  visual_elements_zh?: string; // 具體視覺元素（新增，可選以保持向後相容）
   image_prompts: PromptData[];
 }
 

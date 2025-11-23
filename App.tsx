@@ -316,7 +316,7 @@ const App: React.FC = () => {
                 </h1>
             </div>
             <div className="flex gap-4">
-                <button onClick={() => setIsGuideOpen(true)} className="text-gray-400 hover:text-white text-sm font-medium transition-colors">功能導覽 v2.8</button>
+                <button onClick={() => setIsGuideOpen(true)} className="text-gray-400 hover:text-white text-sm font-medium transition-colors">功能導覽 v2.9</button>
                 <button onClick={() => setIsKeyModalOpen(true)} className="text-purple-400 hover:text-purple-300 text-sm font-bold">
                     {hasKey ? '更換 API Key' : '設定 API Key'}
                 </button>
@@ -362,7 +362,7 @@ const App: React.FC = () => {
         {appState === AppState.IDLE && (
             <div className="flex-1 flex flex-col items-center mt-8 text-center">
                 <div className="inline-block px-3 py-1 rounded-full bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-widest mb-6">
-                    New Version 2.8
+                    New Version 2.9
                 </div>
                 <h2 className="text-4xl md:text-6xl font-bold text-white serif mb-4 leading-tight">
                     打造完整的<br/>品牌視覺資產
