@@ -1,7 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ContentPlan, ContentItem } from '../types';
-import { generateMarketingImage, fileToBase64 } from '../services/geminiService';
+import { useImageGeneration } from '../hooks/useImageGeneration';
+import { useImageUpload } from '../hooks/useImageUpload';
 import { Spinner } from './Spinner';
 import { ImageModal } from './ImageModal';
 
@@ -64,42 +65,30 @@ const ScriptEditorRow: React.FC<{
 
 // --- SUB-COMPONENT: Production Card ---
 const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
-  const [image, setImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [refImage, setRefImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  // Aspect Ratio State for Story Slides (only for story_slide type)
   const [storyAspectRatio, setStoryAspectRatio] = useState<'9:16' | '16:9'>('9:16');
   
   // Determine the actual ratio to use
   const actualRatio = item.type === 'story_slide' ? storyAspectRatio : item.ratio;
+  
+  // 使用自訂 Hooks
+  const { image, loading, error, generateImage } = useImageGeneration();
+  const { image: refImage, error: refImageError, uploadImage: uploadRefImage, clearImage: clearRefImage } = useImageUpload();
 
   const handleGenerate = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      // Use the item's edited prompt, specific reference image, and selected aspect ratio
-      const result = await generateMarketingImage(item.visual_prompt_en, refImage || undefined, actualRatio);
-      setImage(result);
-    } catch (e: any) {
-      setError(e.message || "Failed");
-    } finally {
-      setLoading(false);
-    }
+    await generateImage(item.visual_prompt_en, actualRatio, refImage || undefined);
   };
 
   const handleRefUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      try {
-        const base64 = await fileToBase64(e.target.files[0]);
-        setRefImage(base64);
-      } catch (err) {
-        console.error(err);
-      }
+      await uploadRefImage(e.target.files[0]);
     }
+  };
+  
+  const handleClearRefImage = () => {
+    clearRefImage();
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   // Styling based on ratio
@@ -170,7 +159,7 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
                 <div className="relative">
                     <input type="file" ref={fileInputRef} onChange={handleRefUpload} className="hidden" accept="image/*" />
                     <button 
-                        onClick={() => refImage ? setRefImage(null) : fileInputRef.current?.click()}
+                        onClick={() => refImage ? handleClearRefImage() : fileInputRef.current?.click()}
                         className={`text-[10px] flex items-center gap-1 px-2 py-1 rounded border transition-colors ${refImage ? 'border-red-500/50 text-red-400 hover:bg-red-900/20' : 'border-gray-600 text-gray-500 hover:text-white hover:border-gray-400'}`}
                         title={refImage ? "移除參考圖" : "上傳參考圖 (Logo/風格)"}
                     >
@@ -204,7 +193,7 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
                             onClick={() => {
                                 if (storyAspectRatio !== '16:9') {
                                     setStoryAspectRatio('16:9');
-                                    setImage(null); // 清除已生成的圖片，因為比例改變了
+                                    // 比例改變時需要重新生成，但由使用者手動觸發
                                 }
                             }}
                             className={`flex-1 py-1 px-2 rounded text-[10px] font-bold transition-colors ${
@@ -220,7 +209,7 @@ const ProductionCard: React.FC<{ item: ContentItem }> = ({ item }) => {
             )}
             
             <p className="text-xs text-gray-400 line-clamp-2" title={item.copy_zh}>{item.copy_zh}</p>
-            {error && <p className="text-[10px] text-red-400">{error}</p>}
+            {(error || refImageError) && <p className="text-[10px] text-red-400">{error || refImageError}</p>}
         </div>
 
         {/* Image Modal */}

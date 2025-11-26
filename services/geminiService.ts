@@ -32,12 +32,24 @@ const cleanJson = (text: string): string => {
 };
 
 export const fileToBase64 = async (file: File): Promise<string> => {
+  // 檔案大小檢查
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+  if (file.size > MAX_SIZE) {
+    throw new Error(`檔案大小超過限制（最大 ${MAX_SIZE / 1024 / 1024}MB）`);
+  }
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => {
-      resolve(reader.result as string);
+      if (reader.result) {
+        resolve(reader.result as string);
+      } else {
+        reject(new Error('無法讀取檔案'));
+      }
     };
-    reader.onerror = reject;
+    reader.onerror = () => {
+      reject(new Error('檔案讀取失敗'));
+    };
     reader.readAsDataURL(file);
   });
 };

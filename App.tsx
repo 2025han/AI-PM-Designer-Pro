@@ -56,15 +56,43 @@ const App: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      
+      // 檔案大小檢查
+      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+      if (file.size > MAX_SIZE) {
+        setErrorMsg(`檔案大小超過限制（最大 10MB），請壓縮圖片後再試。`);
+        setErrorType(ErrorType.VALIDATION);
+        return;
+      }
+      
+      // 檔案類型檢查
+      const acceptedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+      if (!acceptedTypes.includes(file.type)) {
+        setErrorMsg(`不支援的檔案類型。請上傳 JPG、PNG 或 WebP 格式的圖片。`);
+        setErrorType(ErrorType.VALIDATION);
+        return;
+      }
+      
       setSelectedFile(file);
       const reader = new FileReader();
-      reader.onload = (ev) => setImagePreview(ev.target?.result as string);
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          setImagePreview(ev.target.result as string);
+        }
+      };
+      reader.onerror = () => {
+        setErrorMsg('圖片讀取失敗，請稍候再試。');
+        setErrorType(ErrorType.VALIDATION);
+      };
       reader.readAsDataURL(file);
+      
       // Reset results but keep inputs
       setAnalysisResult(null);
       setContentPlan(null);
       setEditedPlanItems([]);
       setAppState(AppState.IDLE);
+      setErrorMsg("");
+      setErrorType(null);
     }
   };
 
